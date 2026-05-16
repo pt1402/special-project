@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday!</title>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+    
+    <style>
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0; padding: 0; height: 100vh;
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            background: linear-gradient(135deg, #ffdde1 0%, #ffc0cb 100%);
+            overflow: hidden; font-family: sans-serif;
+        }
+
+        /* --- Intro Screen --- */
+        #intro {
+            position: absolute; top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: #ffdde1;
+            display: flex; justify-content: center; align-items: center;
+            z-index: 100; cursor: pointer;
+            transition: opacity 0.5s ease-out;
+            font-family: 'Dancing Script', cursive;
+            font-size: 3em; color: #c2185b;
+        }
+
+        /* --- Cake Dropping Animation --- */
+        .cake-container {
+            position: relative; width: 120px; height: 140px;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: flex-end;
+            margin-bottom: 20px; z-index: 10;
+        }
+
+        .layer {
+            background-color: #fce4ec; 
+            border-radius: 8px;
+            border-bottom: 8px solid #8d5524; 
+            opacity: 0; 
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .bottom-layer { width: 120px; height: 40px; }
+        .middle-layer { width: 90px; height: 35px; }
+        .top-layer { width: 60px; height: 30px; }
+        
+        .candle {
+            width: 8px; height: 30px; background: repeating-linear-gradient(45deg, white, white 5px, #ff4081 5px, #ff4081 10px);
+            opacity: 0; position: relative; border-radius: 2px;
+        }
+
+        .flame {
+            position: absolute; top: -15px; left: -3px;
+            width: 14px; height: 18px; background: #ff9d00;
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            opacity: 0;
+        }
+
+        /* Active classes triggered by JS */
+        .active .layer, .active .candle {
+            animation: dropIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+        .active .flame {
+            animation: flicker 0.2s infinite alternate;
+            opacity: 1; transition-delay: 2s;
+        }
+
+        .active .bottom-layer { animation-delay: 0.2s; }
+        .active .middle-layer { animation-delay: 0.6s; }
+        .active .top-layer { animation-delay: 1.0s; }
+        .active .candle { animation-delay: 1.4s; }
+
+        @keyframes dropIn {
+            0% { transform: translateY(-50vh); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes flicker {
+            0% { transform: scale(1); background: #ff9d00; }
+            100% { transform: scale(1.1); background: #ffb74d; }
+        }
+
+        /* --- Text Styling --- */
+        .text-container { z-index: 10; min-height: 1.5em; text-align: center; }
+        .Happy__Birthday {
+            font-family: 'Dancing Script', cursive; 
+            color: #c2185b; font-size: 3em; font-weight: 700;
+            text-shadow: 2px 2px 5px rgba(255, 255, 255, 0.7);
+        }
+        .cursor {
+            display: inline-block; width: 3px; background-color: #c2185b;
+            animation: blink 1s step-end infinite;
+        }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+        
+        /* --- Falling Confetti --- */
+        .confetti { position: absolute; top: -10px; z-index: 1; opacity: 0.8; }
+
+        /* --- Celebration Blast (Balloons & Fireworks) --- */
+        #balloon-container, #firework-container {
+            position: absolute; top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none; 
+            z-index: 8; 
+        }
+
+        /* Balloons CSS */
+        .balloon {
+            position: absolute; bottom: -150px;
+            width: 70px; height: 90px;
+            background-color: transparent; 
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            box-shadow: inset 2px 2px 15px rgba(255,255,255,0.4);
+            animation: balloonFloat 4s ease-in forwards;
+            opacity: 1;
+        }
+        .balloon::before { 
+            content: ''; position: absolute; bottom: -8px; left: calc(50% - 7px);
+            width: 0; height: 0;
+            border-left: 7px solid transparent; border-right: 7px solid transparent;
+            border-bottom: 12px solid inherit; 
+        }
+        .balloon::after { 
+            content: ''; position: absolute; bottom: -90px; left: calc(50% - 1px);
+            width: 2px; height: 80px; background-color: rgba(255,255,255,0.5);
+        }
+
+        @keyframes balloonFloat {
+            0% { transform: translateY(0vh) rotate(0deg); opacity: 1; }
+            50% { transform: translateY(-50vh) rotate(5deg); opacity: 1; }
+            100% { transform: translateY(-120vh) rotate(-5deg); opacity: 0.6; }
+        }
+
+        /* Fireworks CSS */
+        .firework-particle {
+            position: absolute; border-radius: 50%;
+            width: 10px; height: 10px;
+            background-color: transparent; 
+            pointer-events: none;
+            opacity: 1;
+        }
+
+        @keyframes fireworkBurst {
+            0% { transform: translate(0,0) scale(0); opacity: 1; }
+            100% { transform: translate(var(--x), var(--y)) scale(1.5); opacity: 0; }
+        }
+
+        @media (max-width: 600px) { .Happy__Birthday { font-size: 2em; } }
+    </style>
+</head>
+<body>
+
+    <audio id="bg-music" src="https://files.catbox.moe/dnmx8p.mp4" loop></audio>
+
+    <div id="intro">Tap to open ❤️</div>
+
+    <div id="balloon-container"></div>
+    <div id="firework-container"></div>
+
+    <div class="cake-container" id="cake">
+        <div class="candle"><div class="flame"></div></div>
+        <div class="layer top-layer"></div>
+        <div class="layer middle-layer"></div>
+        <div class="layer bottom-layer"></div>
+    </div>
+
+    <div class="text-container">
+        <span class="Happy__Birthday" id="typewriter"></span><span class="cursor">&nbsp;</span>
+    </div>
+
+    <script>
+        const introScreen = document.getElementById('intro');
+        const music = document.getElementById('bg-music');
+        const cake = document.getElementById('cake');
+        const typeWriterElement = document.getElementById('typewriter');
+        
+        const mainPalette = ['#c2185b', '#ffb6c1', '#ffffff', '#ff69b4', '#ff1493'];
+
+        const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+        introScreen.addEventListener('click', async () => {
+            introScreen.style.opacity = '0';
+            music.play();
+            
+            setTimeout(() => {
+                introScreen.style.display = 'none';
+                cake.classList.add('active'); 
+            }, 500);
+
+            await sleep(2500);
+            startTypingSequence();
+            
+            setInterval(createConfetti, 150);
+        });
+
+        // The custom typing logic with backspacing (Reverted to plain text)
+        async function startTypingSequence() {
+            const part1 = "Happy Birthday my dear Tanvi";
+            
+            // Type the first part
+            for (let i = 0; i < part1.length; i++) {
+                typeWriterElement.textContent += part1.charAt(i);
+                await sleep(Math.random() * 80 + 50); 
+            }
+
+            // Dramatic pause before noticing the mistake
+            await sleep(800);
+
+            // Backspace twice (deletes 'a' and 'k')
+            for (let i = 0; i < 3; i++) {
+                typeWriterElement.textContent = typeWriterElement.textContent.slice(0, -1);
+                await sleep(200);
+            }
+
+            // Small pause before correcting
+            await sleep(500);
+
+            // Type the correction and trigger blast simultaneously
+            const part2 = "nnuu!";
+            for (let i = 0; i < part2.length; i++) {
+                typeWriterElement.textContent += part2.charAt(i);
+                
+                // Trigger the blast exactly when the '!' is typed
+                if (i === part2.length - 1) {
+                    triggerCelebration();
+                }
+                await sleep(Math.random() * 80 + 50);
+            }
+        }
+
+        function triggerCelebration() {
+            createBalloons();
+            createFireworksBlast();
+        }
+
+        function createBalloons() {
+            const container = document.getElementById('balloon-container');
+            for (let i = 0; i < 25; i++) { 
+                const balloon = document.createElement('div');
+                balloon.classList.add('balloon');
+                
+                balloon.style.left = Math.random() * 100 + 'vw';
+                
+                const color = mainPalette[Math.floor(Math.random() * mainPalette.length)];
+                balloon.style.backgroundColor = color;
+                balloon.style.borderColor = color; 
+                balloon.style.color = color; 
+
+                balloon.style.animationDelay = Math.random() * 2 + 's';
+                balloon.style.animationDuration = Math.random() * 3 + 3 + 's';
+
+                container.appendChild(balloon);
+                setTimeout(() => balloon.remove(), 7000);
+            }
+        }
+
+        function createFireworksBlast() {
+            const container = document.getElementById('firework-container');
+            const positions = [
+                {x: 20, y: 70}, {x: 35, y: 60}, {x: 50, y: 50}, 
+                {x: 65, y: 60}, {x: 80, y: 70}, {x: 50, y: 75}  
+            ];
+            positions.forEach(pos => createSingleFirework(pos.x, pos.y, container));
+        }
+
+        function createSingleFirework(leftVal, bottomVal, container) {
+            const particleCount = 40; 
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('firework-particle');
+                
+                particle.style.left = leftVal + 'vw';
+                particle.style.bottom = bottomVal + 'vh';
+                
+                const color = mainPalette[Math.floor(Math.random() * mainPalette.length)];
+                particle.style.backgroundColor = color;
+
+                const angle = Math.random() * Math.PI * 2;
+                const distance = Math.random() * 150 + 50;
+                const x = Math.cos(angle) * distance;
+                const y = Math.sin(angle) * distance;
+                
+                particle.style.setProperty('--x', `${x}px`);
+                particle.style.setProperty('--y', `${y}px`);
+
+                const size = Math.random() * 8 + 4 + 'px';
+                particle.style.width = size;
+                particle.style.height = size;
+
+                particle.style.animation = `fireworkBurst 1s ${Math.random() * 0.5}s ease-out forwards`;
+
+                container.appendChild(particle);
+                setTimeout(() => particle.remove(), 2000);
+            }
+        }
+
+        function createConfetti() {
+            const confetti = document.createElement('div');
+            confetti.classList.add('confetti');
+            const size = Math.random() * 8 + 5 + 'px';
+            confetti.style.width = size; confetti.style.height = size;
+            confetti.style.left = Math.random() * 100 + 'vw';
+            confetti.style.backgroundColor = mainPalette[Math.floor(Math.random() * mainPalette.length)];
+            if (Math.random() > 0.5) confetti.style.borderRadius = '50%';
+            document.body.appendChild(confetti);
+
+            let topPosition = -10, rotation = 0;
+            const fallSpeed = Math.random() * 3 + 2;
+            const rotationSpeed = (Math.random() - 0.5) * 10;
+
+            function animateConfetti() {
+                topPosition += fallSpeed; rotation += rotationSpeed;
+                confetti.style.top = topPosition + 'px';
+                confetti.style.transform = `rotate(${rotation}deg)`;
+                if (topPosition < window.innerHeight) {
+                    requestAnimationFrame(animateConfetti);
+                } else {
+                    confetti.remove();
+                }
+            }
+            requestAnimationFrame(animateConfetti);
+        }
+    </script>
+</body>
+</html>
