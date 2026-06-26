@@ -200,7 +200,7 @@
 
         // The custom typing logic with backspacing (Reverted to plain text)
         async function startTypingSequence() {
-            const part1 = "Happy Birthday my dear Tanvi";
+            const part1 = "Happy Birthday my dear Janhavi";
             
             // Type the first part
             for (let i = 0; i < part1.length; i++) {
@@ -211,8 +211,8 @@
             // Dramatic pause before noticing the mistake
             await sleep(800);
 
-            // Backspace twice (deletes 'a' and 'k')
-            for (let i = 0; i < 3; i++) {
+            // Backspace 
+            for (let i = 0; i < 5; i++) {
                 typeWriterElement.textContent = typeWriterElement.textContent.slice(0, -1);
                 await sleep(200);
             }
